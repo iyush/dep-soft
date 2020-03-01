@@ -1,6 +1,7 @@
-# RPN Calculator
+# Stats Calculator
 
-Done in Conjuction with Drishti Maharjan.
+Authors: Drishti Maharjan
+        Aayush Sharma Acharya
 
 ## Requirements
 1. CMake 3.0.0 
