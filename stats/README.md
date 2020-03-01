@@ -1,6 +1,6 @@
 # Stats Calculator
 
-Authors: Drishti Maharjan
+Authors: Drishti Maharjan,
         Aayush Sharma Acharya
 
 ## Requirements
