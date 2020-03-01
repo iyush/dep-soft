@@ -1,4 +1,5 @@
 # Stats Calculator
+Demonstrating use of American Fuzzy Lop for generating test cases.
 
 Authors: Drishti Maharjan,
         Aayush Sharma Acharya
