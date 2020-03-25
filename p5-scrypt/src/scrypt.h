@@ -38,8 +38,7 @@ sc_dec8(uint8_t c, uint32_t k);
  * \param k 32-bit key.
  */
 
-void
-sc_enc_ecb(unsigned char *m, unsigned char *c, size_t len, uint32_t k);
+void sc_enc_ecb(unsigned char *m, unsigned char *c, size_t len, uint32_t k);
 
 /**
  * \brief Decrypt variable-length ciphertext using a 32-bit key in ECB mode.
@@ -50,8 +49,7 @@ sc_enc_ecb(unsigned char *m, unsigned char *c, size_t len, uint32_t k);
  * \param k 32-bit key.
  */
 
-void
-sc_dec_ecb(unsigned char *c, unsigned char *m, size_t len, uint32_t k);
+void sc_dec_ecb(unsigned char *c, unsigned char *m, size_t len, uint32_t k);
 
 /**
  * \brief Encrypt a variable-length cleartext using a 32-bit key in CBC mode.
@@ -63,9 +61,8 @@ sc_dec_ecb(unsigned char *c, unsigned char *m, size_t len, uint32_t k);
  * \param iv 8-bit initialization vector.
  */
 
-void
-sc_enc_cbc(unsigned char *m, unsigned char *c, size_t len,
-	   uint32_t k, uint8_t iv);
+void sc_enc_cbc(unsigned char *m, unsigned char *c, size_t len,
+				uint32_t k, uint8_t iv);
 
 /**
  * \brief Decrypt variable-length ciphertext using a 32-bit key in CBC mode.
@@ -77,8 +74,8 @@ sc_enc_cbc(unsigned char *m, unsigned char *c, size_t len,
  * \param iv 8-bit initialization vector.
  */
 
-void
-sc_dec_cbc(unsigned char *c, unsigned char *m, size_t len,
-	   uint32_t k, uint8_t iv);
+void sc_dec_cbc(unsigned char *c, unsigned char *m, size_t len,
+				uint32_t k, uint8_t iv);
 
+uint8_t f_inv(uint8_t b);
 #endif

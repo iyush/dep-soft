@@ -6,7 +6,7 @@
 
 #include "scrypt.h"
 #include "stdio.h"
-
+#include "math.h"
 uint8_t
 f(uint8_t b)
 {
@@ -16,6 +16,43 @@ f(uint8_t b)
 uint8_t
 f_inv(uint8_t b)
 {
+    uint8_t x;
+    if (b >= 0 && b <= 15)
+    {
+        if (b % 2 != 0)
+        {
+
+            x = abs(b - 7);
+            if (b >= 9 && b <= 13)
+            {
+                if (b == 9)
+                {
+                    return 14;
+                }
+
+                if (b == 13)
+                {
+                    return 10;
+                }
+                uint8_t i;
+                i = 13 - b;
+                x += 4 * i;
+            }
+        }
+        else
+        {
+            x = (14 - b) + 1;
+        }
+
+                return x;
+    }
+
+    else
+    {
+        return EXIT_FAILURE;
+    }
+
+    /*
     switch(b)
     {
         case 7:
@@ -55,13 +92,8 @@ f_inv(uint8_t b)
             printf("Lookup not found");
             return EXIT_FAILURE;
     }
+    */
 }
-
-
-
-
-
-
 
 uint8_t
 sub(uint8_t b)
@@ -111,8 +143,6 @@ sub_inverse(uint8_t b)
 
     //printf("Merged %x \n", merged);
     return merged;
-
-
 }
 
 uint8_t
@@ -143,9 +173,8 @@ sc_enc8(uint8_t m, uint32_t k)
     // printf("we got m: %x\n", m);
     // printf("we got k: %x\n", k);
 
-
     uint8_t splittedkeys[4];
-    uint8_t *vp = (uint8_t *) &k;
+    uint8_t *vp = (uint8_t *)&k;
 
     // split 32 bits into 8 x 4 equal sized bits
     splittedkeys[3] = vp[0];
@@ -158,11 +187,10 @@ sc_enc8(uint8_t m, uint32_t k)
     // printf("we splittedkeys: %x\n", splittedkeys[2]);
     // printf("we splittedkeys: %x\n", splittedkeys[3]);
 
-
     /* round 0 */
 
     // key step
-    xored =  splittedkeys[0] ^ m;
+    xored = splittedkeys[0] ^ m;
 
     /* round 1 */
 
@@ -173,30 +201,30 @@ sc_enc8(uint8_t m, uint32_t k)
     rotated = rot_shift_left_2(subbed);
 
     // key step
-    xored =  splittedkeys[1] ^ rotated;
+    xored = splittedkeys[1] ^ rotated;
     printf("HERE %x \n", xored);
 
     // printf("HERE %x \n", xored);
 
-    // round 2 
+    // round 2
 
     // substitution step
     subbed = sub(xored);
     // permutation step
     rotated = rot_shift_left_2(subbed);
     // key step
-    xored =  splittedkeys[2] ^ rotated;
+    xored = splittedkeys[2] ^ rotated;
 
     // round 3
-    
+
     // substitution step
     subbed = sub(xored);
     // permutation step
     // rotated = rot_shift_left_2(subbed);
     // key step
-    xored =  splittedkeys[3] ^ subbed;
+    xored = splittedkeys[3] ^ subbed;
 
-/*
+    /*
     */
 
     return xored;
@@ -212,9 +240,8 @@ sc_dec8(uint8_t m, uint32_t k)
     // printf("we got m: %x\n", m);
     // printf("we got k: %x\n", k);
 
-
     uint8_t splittedkeys[4];
-    uint8_t *vp = (uint8_t *) &k;
+    uint8_t *vp = (uint8_t *)&k;
 
     // split 32 bits into 8 x 4 equal sized bits
     splittedkeys[0] = vp[0];
@@ -222,24 +249,22 @@ sc_dec8(uint8_t m, uint32_t k)
     splittedkeys[2] = vp[2];
     splittedkeys[3] = vp[3];
 
-
     // printf("we splittedkeys: %x\n", splittedkeys[0]);
     // printf("we splittedkeys: %x\n", splittedkeys[1]);
     // printf("we splittedkeys: %x\n", splittedkeys[2]);
     // printf("we splittedkeys: %x\n", splittedkeys[3]);
 
-
     /* round 0 */
 
     // key step
-    xored =  splittedkeys[0] ^ m;
+    xored = splittedkeys[0] ^ m;
 
     /* round 1 */
 
     // substitution step
     subbed = sub_inverse(xored);
     // key step
-    xored =  splittedkeys[1] ^ subbed;
+    xored = splittedkeys[1] ^ subbed;
     // permutation step
     rotated = rot_shift_right_2(xored);
 
@@ -248,7 +273,7 @@ sc_dec8(uint8_t m, uint32_t k)
     // substitution step
     subbed = sub_inverse(rotated);
     // key step
-    xored =  splittedkeys[2] ^ subbed;
+    xored = splittedkeys[2] ^ subbed;
     // permutation step
     rotated = rot_shift_right_2(xored);
 
@@ -258,28 +283,23 @@ sc_dec8(uint8_t m, uint32_t k)
     // permutation step
     // rotated = rot_shift_left_2(subbed);
     // key step
-    xored =  splittedkeys[3] ^ subbed;
+    xored = splittedkeys[3] ^ subbed;
 
     return xored;
 }
 
-void
-sc_enc_ecb(unsigned char *m, unsigned char *c, size_t len, uint32_t k)
+void sc_enc_ecb(unsigned char *m, unsigned char *c, size_t len, uint32_t k)
 {
 }
 
-void
-sc_dec_ecb(unsigned char *c, unsigned char *m, size_t len, uint32_t k)
+void sc_dec_ecb(unsigned char *c, unsigned char *m, size_t len, uint32_t k)
 {
 }
 
-void
-sc_enc_cbc(unsigned char *m, unsigned char *c, size_t len, uint32_t k, uint8_t iv)
+void sc_enc_cbc(unsigned char *m, unsigned char *c, size_t len, uint32_t k, uint8_t iv)
 {
 }
 
-void
-sc_dec_cbc(unsigned char *c, unsigned char *m, size_t len, uint32_t k, uint8_t iv)
+void sc_dec_cbc(unsigned char *c, unsigned char *m, size_t len, uint32_t k, uint8_t iv)
 {
 }
-

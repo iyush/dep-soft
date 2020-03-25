@@ -88,15 +88,19 @@ int main(int argc, char *argv[])
     // uint8_t iv = 0x42;
     uint8_t iv = 0x61;
 
-
-
     printf("orig %x \n", iv);
     uint8_t enc = sc_enc8(iv, k);
     printf("encoded %x \n", enc);
     uint8_t dec = sc_dec8(enc, k);
     printf("decoded %x \n", dec);
 
+    /*
+    for (int i = 0; i < 16; i++)
+    {
 
+        printf("%d b %d x\n", i, f_inv(i));
+    }
+*/
     /*
     int i;
     char c;
@@ -129,6 +133,6 @@ int main(int argc, char *argv[])
     }
 
     */
-    
+
     return EXIT_SUCCESS;
 }
