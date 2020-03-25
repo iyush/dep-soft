@@ -7,7 +7,6 @@
 #include <check.h>
 
 #include "scrypt.h"
-
 START_TEST(test_sc_enc_dec)
 {
     uint16_t x;
@@ -32,6 +31,7 @@ START_TEST(test_sc_ecb)
 }
 END_TEST
 
+
 START_TEST(test_sc_cbc)
 {
     uint32_t k = 0x98267351;
@@ -45,6 +45,7 @@ START_TEST(test_sc_cbc)
     ck_assert_int_eq(memcmp(b, c, len), 0);
 }
 END_TEST
+
 
 START_TEST(test_sc_ecb_roundtrip)
 {

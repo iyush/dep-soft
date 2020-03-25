@@ -140,7 +140,7 @@ sc_enc8(uint8_t m, uint32_t k)
     uint8_t subbed;
     uint8_t xored;
     uint8_t rotated;
-    // printf("we got m: %x\n", m);
+    // printf("we got c: %x\n\n", m);
     // printf("we got k: %x\n", k);
 
 
@@ -174,7 +174,7 @@ sc_enc8(uint8_t m, uint32_t k)
 
     // key step
     xored =  splittedkeys[1] ^ rotated;
-    printf("HERE %x \n", xored);
+    // printf("HERE %x \n", xored);
 
     // printf("HERE %x \n", xored);
 
@@ -196,9 +196,6 @@ sc_enc8(uint8_t m, uint32_t k)
     // key step
     xored =  splittedkeys[3] ^ subbed;
 
-/*
-    */
-
     return xored;
 }
 
@@ -209,10 +206,7 @@ sc_dec8(uint8_t m, uint32_t k)
     uint8_t subbed;
     uint8_t xored;
     uint8_t rotated;
-    // printf("we got m: %x\n", m);
     // printf("we got k: %x\n", k);
-
-
     uint8_t splittedkeys[4];
     uint8_t *vp = (uint8_t *) &k;
 
@@ -266,20 +260,49 @@ sc_dec8(uint8_t m, uint32_t k)
 void
 sc_enc_ecb(unsigned char *m, unsigned char *c, size_t len, uint32_t k)
 {
+    for (int i = 0; i < len; i++) 
+    {
+        // printf("We got %c\n", m[i]);
+        uint8_t enc = sc_enc8( (uint8_t) m[i], k);
+        c[i] = enc;
+    }
 }
 
 void
 sc_dec_ecb(unsigned char *c, unsigned char *m, size_t len, uint32_t k)
 {
+    for (int i = 0; i < len; i++) 
+    {
+        // printf("We got %x\n", c[i]);
+        uint8_t dec = sc_dec8( (uint8_t) c[i], k);
+        m[i] = dec;
+    }
 }
 
 void
 sc_enc_cbc(unsigned char *m, unsigned char *c, size_t len, uint32_t k, uint8_t iv)
 {
+    uint8_t plain_text_xored;
+    for (int i = 0; i < len; i++) 
+    {
+        plain_text_xored =  m[i] ^ iv;
+        iv = sc_enc8( (uint8_t) plain_text_xored, k);
+        c[i] = iv;
+    }
+
 }
 
 void
 sc_dec_cbc(unsigned char *c, unsigned char *m, size_t len, uint32_t k, uint8_t iv)
 {
+    for (int i = 0; i < len; i++) 
+    {
+        // printf("We got %x\n", c[i]);
+        uint8_t dec = sc_dec8( (uint8_t) c[i], k);
+        dec = dec ^ iv;
+        m[i] = dec;
+
+        iv = c[i];
+    }
 }
 
