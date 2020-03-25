@@ -85,7 +85,8 @@ getlong_or_die(char *s)
 int main(int argc, char *argv[])
 {
     uint32_t k = 0x98267351;
-    uint8_t iv = 0x42;
+    // uint8_t iv = 0x42;
+    uint8_t iv = 0x61;
 
 
 
