@@ -1,3 +1,9 @@
+# Scrypt
+
+(Done in conjuction with Drishti Maharjan)
+
+See hw5.pdf for explanations regarding the code.
+
 This project implements a simple substitution-permutation network
 encryption algorithm calles scrypt. The algorithm is designed to be
 simplistic, so do not use it for anything serious. The purpose of this
