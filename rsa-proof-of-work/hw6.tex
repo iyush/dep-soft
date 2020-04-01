@@ -1,0 +1,122 @@
+\documentclass[a4paper]{article}
+% \documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{enumitem}
+\usepackage{fancyvrb}
+\usepackage{amssymb}
+\usepackage[a4paper,margin=1in,footskip=0.25in]{geometry}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\title{Assignment 6}
+
+\author{Aayush Sharma Acharya}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\paragraph*{6.1: eavesdropping on rsa}
+
+\begin{enumerate}[label=(\alph*)]
+    \item We know: $$ e = 15852553,  n = 44331583 $$ 
+        We first perform prime factorization for our number $n$, We can do that by using the following function: 
+        \begin{verbatim}
+getFactors :: Integer -> [Integer]
+getFactors n = [x | x <- 2:[3,5..n-1], n `mod` x == 0]
+        \end{verbatim}
+        Since we know that $n$ is going to decomposed into two prime factors $p$ and $q$, we do not need to check prime for each of our factors in the above function. We get the result: $$ n = 44331583 = 5003 \cdot 8861$$
+        If we let $$p = 5003 , q = 8861$$
+        We can calculate $\Phi(n)$ by:
+        $$ \Phi(n) = \Phi(p \cdot q) = \Phi(p) \cdot \Phi(q) = \Phi(5003) \cdot \Phi(8861) = 5002 \cdot 8860 = 44317720 $$
+        All of the above steps can be performed by our function: 
+        \begin{verbatim}
+getPhi :: Integer -> Integer
+getPhi n =  foldl (\acc x -> acc * x) 1  $ map ((-)1) (getFactors n)
+        \end{verbatim}
+        The above function gets the factor of the n, decreases them by 1 and then multiply both the elements in the list to get a scalar.
+        Now we have to solve $$ed\ (mod\ n) \equiv 1$$
+        We can solve this by using our \texttt{egcd} function and taking the second element of that function:
+        \begin{verbatim}
+egcd :: Integer -> Integer -> (Integer, Integer, Integer)
+egcd a 0 = (abs a, signum a, 0)
+egcd a b = (d, t, s - (a `div` b) * t)
+    where (d, s, t) = egcd b (a `mod` b)
+
+sec':: (a, a, a) -> a
+sec' (_, x, _) = x
+        \end{verbatim}
+        So, solving the modular inverse we have:
+        $$d = 1951097$$
+
+        We can do everything all at once using the following simple function:
+        \begin{verbatim}
+getDecryption :: Integer -> Integer -> Integer
+getDecryption n e = sec' $ egcd e $ getPhi n
+        \end{verbatim}
+    So, from the calculations, we have $(e, d, n) = (15852553, 1951097, 44331583)$. We use this  in the following  haskell code to decrypt our list:
+    \begin{verbatim}
+data Key = Key Integer Integer deriving (Show)
+
+dec :: Integer -> Key -> Integer
+dec c (Key n d) = c^d `mod` n
+
+decList :: [Integer] -> Key -> [Integer]
+decList ml k = map (\x -> dec x k) ml
+    \end{verbatim}
+
+    Decryption result in following list:
+    \begin{verbatim}
+    71,111,44,32,103,111,32,
+    97,119,97,121,32,67,111,
+    114,111,110,97,32,118,105,
+    114,117,115,33
+    \end{verbatim}
+
+\item We use the following haskell code to convert our decryption list to character list:
+    \begin{verbatim}
+ordList :: [Int] -> [Char]
+ordList l = map chr l
+    \end{verbatim}
+    Upon conversion we get: \texttt{Go, go away Corona virus!}
+
+    \textbf{All of this code is provided in the zip file: Run \texttt{runhaskell rsa.hs} to execute it}
+\end{enumerate}
+
+\paragraph*{6.2: proof of work}
+\begin{enumerate}[label=(\alph*)]
+    \item \texttt{QctAhSrD} gets converted to SHA256 checksum with first 12 bits as 0s.
+    \item For autogeneration of the plain text which gets convert to our required checksum we use the following short python code: (included in the zip file, run \texttt{python3 proof-of-work.py}
+    \begin{verbatim}
+import hashlib
+import random
+import string
+
+def convert_to_sha256(bs):
+    return hashlib.sha256(bs).hexdigest()
+
+def generate_8_byte():
+    e = ''
+        .join(
+            random.choice(
+                string.ascii_uppercase + string.ascii_lowercase + string.digits
+            ) for _ in range(8)
+        )
+    return e, str.encode(e)
+
+def main():
+    while 1:
+        plain, as_bytes = generate_8_byte()
+        hs = convert_to_sha256(as_bytes)
+        if (hs[0:3] == "000"):
+            print(plain, " : ", hs)
+            return
+
+    \end{verbatim}
+\end{enumerate}
+
+\end{document}
