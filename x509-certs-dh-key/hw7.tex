@@ -1,0 +1,119 @@
+\documentclass[a4paper]{article}
+% \documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{enumitem}
+\usepackage{fancyvrb}
+\usepackage{amssymb}
+\usepackage[a4paper,margin=1in,footskip=0.25in]{geometry}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\title{Assignment 7}
+
+\author{Aayush Sharma Acharya}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\paragraph*{7.1: X.509 certificates}
+
+\begin{enumerate}[label=(\alph*)]
+    \item Private Key generate can be done using the following method:
+        \begin{verbatim}
+openssl genrsa -out private.key 8912
+        \end{verbatim}
+        Public Key can be generate by:
+        \begin{verbatim}
+openssl rsa -in private.key -pubout -out public.key
+        \end{verbatim}
+        Key size we used is: 8912 bits
+
+    \item We can generate a Certificate Sigining Request for the RSA using the following command:
+        \begin{verbatim}
+openssl req -new -key private.key -out CSR.csr
+        \end{verbatim}
+
+    \item We can create CA to sign our certificate generated above. In order to setup a Certificate Authority we do:
+        \begin{verbatim}
+/usr/lib/ssl/misc/CA.pl -newca
+        \end{verbatim}
+        It will ask for a PEM passphrase, this protects our CA certicate's key. It will ask for certificate details (we will be using the provided default options for now). It will then ask for the password above again to create a certficate with newly signed key. Our new \texttt{cacert.pem} file is in \texttt{./demoCA}.
+\end{enumerate}
+
+\paragraph*{7.2: X.509 certificate validation}
+\begin{enumerate}[label=(\alph*)]
+    \item Validity of \texttt{cnds.jacobs-university.de} is
+        \begin{verbatim}
+        From: 2018-09-19, 3:31:30 p.m. (Central European Summer Time)
+        To: 2020-12-21, 2:31:30 p.m. (Central European Summer Time)
+        \end{verbatim}
+        The certificates and their validity in the chain are:
+        \begin{enumerate}
+            \item DFN-Verein Global Issuing CA
+            \begin{verbatim}
+            From: 2016-05-24, 1:38:40 p.m. (Central European Summer Time)
+            To: 2031-02-23, 12:59:59 a.m. (Central European Summer Time)
+            \end{verbatim}
+            \item DFN-Verein Certification Authority 2
+            \begin{verbatim}
+            From: 2016-02-22, 2:38:22 p.m. (Central European Summer Time)
+            To: 2031-02-23, 12:59:59 a.m. (Central European Summer Time)
+            \end{verbatim}
+            \item T-Telesec GlobalRoot Class 2
+            \begin{verbatim}
+            From: 2008-10-01, 12:40:14 p.m. (Central European Summer Time)
+            To: 2033-10-02, 1:59:59 a.m. (Central European Summer Time)
+            \end{verbatim}
+        \end{enumerate}
+    \item OCSP stapling is a standard for checking the revocation status of digital certificates. Historically, clients were responsible to create OCSP requests that contained server's certificate serial number and send it to the Certifation Authority. But because of performance reasons, OCSP staping as a standard was introducted. In this standard, the certificate holder i.e the server itself queries the OCSP server at regular intervals, getting a signed time-samped OCSP response in return. When a client tries to connect to the server, this response is included intially with the TLS handshake. This scenario is helpful to privacy and performance as there is no need for client to contant a 3rd party to check revocation status. \cite{OCSP}. 
+        The sites \url{https://cnds.jacobs-university.de} and \url{https://www.beadg.de/} do support OCSP Stapling. We determine this performing the following steps (in firefox):
+        \begin{enumerate}[label=(\alph*)]
+            \item Click the lock icon beside the url
+            \item Click the right arrow beside {\color{yellow} Connection Secure}
+            \item Click on "More Information button"
+            \item A dialog popsup, click on View Certificate button in the Website Identitysection.
+            \item A new page is loaded into firefox. Scroll down to the buttom, you can see the \textbf{Embedded SCTs} section which will contain all the time stamps of OCSP requests. SCTs here refer to Signed Certificate Timestamps.
+        \end{enumerate}
+\end{enumerate}
+
+\paragraph*{7.3: diffie hellman key exchanges}
+\begin{enumerate}[label=(\alph*)]
+    \item Alice sends $ g^{a}\ mod\ p = 42^{27}\ mod\ 191 = 143 $ to Bob.
+    \item $K_{AB} = 178^{27}\ mod\ 191 = 94$ and since $K_{AB}$ has to symmetric for Bob aswell. We need to solve the equation to know the random number Bob picked:
+        $$ 143^{x_B}\ mod\ 191 = 94$$
+Since $p=191$, we can easy brute force this number by using the python script:
+            \begin{verbatim}
+x = 0
+while 1:
+    if (143**(x) % 191) == 94 or x > 191:
+        print(x)
+        break
+    x+=1
+            \end{verbatim}
+\end{enumerate}
+We have $x_{B} = 51$. Hence the random number generated by Bob is 51.
+
+
+\begin{thebibliography}{9}
+\bibitem{OCSP}
+GlobalSign.
+\textit{OCSP Stapling}\\
+\url{https://support.globalsign.com/ssl/ssl-certificates-installation/ocsp-stapling}
+\end{thebibliography}
+
+
+
+\end{document}
